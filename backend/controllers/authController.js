@@ -116,12 +116,25 @@ exports.loginUser = async (req, res) => {
 exports.getMe = async (req, res) => {
     try {
         const foundUser = await User.findById(req.user.id).select('-password');
-        
+
         if (!foundUser) {
             return res.status(404).json({ msg: 'User not found' });
         }
-        
+
         res.json(foundUser);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+};
+
+// @desc     Get all doctors (public)
+// @route    GET api/auth/doctors
+// @access   Public
+exports.getDoctorsPublic = async (req, res) => {
+    try {
+        const doctors = await User.find({ role: 'doctor' }).select('name _id');
+        res.json(doctors);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');
