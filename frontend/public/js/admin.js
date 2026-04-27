@@ -7,7 +7,7 @@ const initAdmin = async () => {
     // Default open based on hash or overview
     const hash = window.location.hash.replace('#', '') || 'overview';
     switchAdminTab(hash);
-    
+
     window.addEventListener('hashchange', () => {
         const newHash = window.location.hash.replace('#', '') || 'overview';
         switchAdminTab(newHash);
@@ -22,6 +22,7 @@ const loadData = async () => {
         renderUsersTable();
         renderDoctorsGrid();
         renderChart();
+        if (window.lucide) lucide.createIcons();
     } catch (err) {
         console.error('Failed to load admin data:', err);
     }
@@ -42,7 +43,7 @@ window.switchAdminTab = (tabId) => {
     // Show selected section
     document.querySelectorAll('.admin-section').forEach(sec => sec.classList.add('hidden'));
     document.getElementById(`section-${tabId}`)?.classList.remove('hidden');
-    
+
     // Update sidebar links
     document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
         link.classList.remove('active');
@@ -84,13 +85,23 @@ const renderUsersTable = () => {
                 <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
                     ${u.role}
                 </span>
+                ${u.role === 'doctor' && !u.isApproved ? `
+                    <span class="ml-2 px-2 py-1 text-[9px] font-black uppercase tracking-tighter rounded bg-amber-100 text-amber-600">Pending</span>
+                ` : ''}
             </td>
             <td class="px-6 py-4 text-right">
-                ${u.role !== 'admin' ? `
-                    <button onclick="deleteUser('${u._id}')" class="p-2 text-danger hover:bg-rose-50 rounded-lg transition-colors">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
-                ` : ''}
+                <div class="flex items-center justify-end gap-2">
+                    ${u.role === 'doctor' && !u.isApproved ? `
+                        <button onclick="approveDoctor('${u._id}')" class="p-2 text-primary hover:bg-emerald-50 rounded-lg transition-colors" title="Approve Doctor">
+                            <i data-lucide="user-check" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                    ${u.role !== 'admin' ? `
+                        <button onclick="window.deleteUser('${u._id}')" class="p-2 text-danger hover:bg-rose-50 rounded-lg transition-colors" title="Delete User">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    ` : ''}
+                </div>
             </td>
         </tr>
     `).join('');
@@ -101,7 +112,7 @@ const renderDoctorsGrid = () => {
     if (!grid) return;
 
     const doctors = usersData.filter(u => u.role === 'doctor');
-    
+
     if (doctors.length === 0) {
         grid.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">No doctors found.</div>`;
         return;
@@ -110,7 +121,7 @@ const renderDoctorsGrid = () => {
     grid.innerHTML = doctors.map(doc => `
         <div class="bg-white dark:bg-slate-800 p-8 rounded-[2.5rem] shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-all group relative">
             <div class="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
-                <button onclick="deleteUser('${doc._id}')" class="p-2 bg-danger text-white rounded-xl shadow-md hover:scale-110 active:scale-95 transition-all">
+                <button onclick="window.deleteUser('${doc._id}')" class="p-2 bg-danger text-white rounded-xl shadow-md hover:scale-110 active:scale-95 transition-all">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             </div>
@@ -123,10 +134,19 @@ const renderDoctorsGrid = () => {
                     <p class="text-xs font-bold text-primary uppercase tracking-widest">Medical Doctor</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400">
+            <div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 mb-6">
                 <i data-lucide="mail" class="w-4 h-4"></i>
                 <span class="text-sm font-medium">${doc.email}</span>
             </div>
+            ${!doc.isApproved ? `
+                <button onclick="approveDoctor('${doc._id}')" class="w-full py-3 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4"></i> Approve Doctor
+                </button>
+            ` : `
+                <div class="flex items-center gap-2 text-emerald-500 font-bold text-xs uppercase tracking-widest">
+                    <i data-lucide="check-circle" class="w-4 h-4"></i> Approved
+                </div>
+            `}
         </div>
     `).join('');
 };
@@ -134,7 +154,7 @@ const renderDoctorsGrid = () => {
 const renderChart = () => {
     const ctx = document.getElementById('userRoleChart');
     if (!ctx) return;
-    
+
     const patients = usersData.filter(u => u.role === 'patient').length;
     const doctors = usersData.filter(u => u.role === 'doctor').length;
     const caregivers = usersData.filter(u => u.role === 'caregiver').length;
@@ -173,13 +193,25 @@ const renderChart = () => {
 };
 
 window.deleteUser = async (id) => {
+    console.log('[Admin] Requesting deletion of user:', id);
     if (confirm('Permanently remove this user from the system?')) {
         try {
             await apiFetch(`/admin/users/${id}`, { method: 'DELETE' });
+            console.log('[Admin] User deleted successfully:', id);
             await loadData();
         } catch (err) {
+            console.error('[Admin] Delete failed:', err);
             alert('Failed to delete user: ' + err.message);
         }
+    }
+};
+
+window.approveDoctor = async (id) => {
+    try {
+        await apiFetch(`/admin/doctors/${id}/approve`, { method: 'PUT' });
+        await loadData();
+    } catch (err) {
+        alert('Failed to approve doctor: ' + err.message);
     }
 };
 
@@ -199,9 +231,9 @@ const handleAddDoctor = async (e) => {
     const password = document.getElementById('doc-password').value;
 
     try {
-        await apiFetch('/admin/doctors', { 
-            method: 'POST', 
-            body: JSON.stringify({ name, email, password }) 
+        await apiFetch('/admin/doctors', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password })
         });
         closeDoctorModal();
         await loadData();

@@ -12,6 +12,7 @@ const MedicineSchema = new mongoose.Schema({
     startDate: { type: Date, default: Date.now },
     notes: { type: String },
     status: { type: String, enum: ['active', 'on hold', 'completed'], default: 'active' },
+    prescribedByRole: { type: String, enum: ['doctor', 'patient', 'caregiver'], default: 'patient' },
     date: { type: Date, default: Date.now }
 });
 

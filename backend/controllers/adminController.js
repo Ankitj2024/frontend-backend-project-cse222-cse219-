@@ -63,7 +63,7 @@ exports.updateDoctor = async (req, res) => {
         const updateData = {};
         if (name) updateData.name = name;
         if (email) updateData.email = email;
-        
+
         if (password) {
             const salt = await bcrypt.genSalt(10);
             updateData.password = await bcrypt.hash(password, salt);
@@ -152,11 +152,34 @@ exports.getAllUsers = async (req, res) => {
 // @access  Private/Admin
 exports.deleteUser = async (req, res) => {
     try {
+        console.log(`[Admin] Attempting to delete user with ID: ${req.params.id}`);
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
         res.json({ msg: 'User removed successfully' });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+};
+
+// @desc    Approve a doctor account
+// @route   PUT /api/admin/doctors/:id/approve
+// @access  Private/Admin
+exports.approveDoctor = async (req, res) => {
+    try {
+        const user = await User.findOneAndUpdate(
+            { _id: req.params.id, role: 'doctor' },
+            { $set: { isApproved: true } },
+            { new: true }
+        ).select('-password');
+
+        if (!user) {
+            return res.status(404).json({ msg: 'Doctor not found' });
+        }
+
+        res.json({ msg: 'Doctor approved successfully', user });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server error');

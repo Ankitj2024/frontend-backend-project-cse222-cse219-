@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - MedRemind Lumina</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Varela+Round&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Varela+Round&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="/css/style.css">
     <script>
@@ -26,7 +28,8 @@
     <div id="profile-app" class="animate-slide-up">
         <header class="mb-10">
             <h2 class="text-3xl font-display font-bold text-slate-800 dark:text-slate-100">Account Settings</h2>
-            <p class="text-slate-400 dark:text-slate-500 font-medium mt-1">Manage your personal information and preferences</p>
+            <p class="text-slate-400 dark:text-slate-500 font-medium mt-1">Manage your personal information and
+                preferences</p>
         </header>
 
         <div class="grid grid-cols-12 gap-8">
@@ -46,18 +49,23 @@
                         </button>
                     </div>
 
-                    <h3 id="display-name" class="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">Sarah Jenkins</h3>
+                    <h3 id="display-name" class="text-2xl font-display font-bold text-slate-800 dark:text-slate-100">
+                        Sarah Jenkins</h3>
                     <p id="display-role" class="text-xs font-bold text-primary uppercase tracking-[0.2em] mt-1">Patient
                     </p>
 
                     <div id="status-med-container" class="w-full grid grid-cols-2 gap-4 mt-10">
-                        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-transparent dark:border-slate-700">
-                            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Status</p>
+                        <div
+                            class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-transparent dark:border-slate-700">
+                            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Status
+                            </p>
                             <p class="text-sm font-bold text-emerald-500">Active</p>
                         </div>
-                        <div id="active-meds-card" class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-transparent dark:border-slate-700">
+                        <div id="active-meds-card"
+                            class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-transparent dark:border-slate-700">
                             <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase mb-1">Meds</p>
-                            <p id="display-med-count" class="text-sm font-bold text-slate-800 dark:text-slate-100">5 Active</p>
+                            <p id="display-med-count" class="text-sm font-bold text-slate-800 dark:text-slate-100">5
+                                Active</p>
                         </div>
                     </div>
 
@@ -70,7 +78,8 @@
                 <div id="personal-info-panel">
                     <div class="card-white">
                         <div class="flex items-center justify-between mb-8 pb-6 border-b border-slate-50">
-                            <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Personal Information</h4>
+                            <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Personal
+                                Information</h4>
                             <button id="edit-details-btn"
                                 class="text-primary font-bold text-sm uppercase tracking-widest hover:underline">Edit
                                 Details</button>
@@ -78,28 +87,38 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Full Name</label>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Full
+                                    Name</label>
                                 <p id="detail-name" class="text-slate-800 dark:text-slate-100 font-medium">--</p>
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Email Address</label>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Email
+                                    Address</label>
                                 <p id="detail-email" class="text-slate-800 dark:text-slate-100 font-medium">--</p>
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Age</label>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Age</label>
                                 <p id="detail-age" class="text-slate-800 dark:text-slate-100 font-medium">--</p>
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Member Since</label>
-                                <p id="detail-joined" class="text-slate-800 dark:text-slate-100 font-medium">Jan 12, 2023</p>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Member
+                                    Since</label>
+                                <p id="detail-joined" class="text-slate-800 dark:text-slate-100 font-medium">Jan 12,
+                                    2023</p>
                             </div>
-                            
+
                             <div class="space-y-1" id="specialty-container" style="display: none;">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Specialty</label>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Specialty</label>
                                 <p id="detail-specialty" class="text-slate-800 dark:text-slate-100 font-medium">--</p>
                             </div>
                             <div class="space-y-1" id="diagnosis-container" style="display: none;">
-                                <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Diagnosis</label>
+                                <label
+                                    class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Diagnosis</label>
                                 <p id="detail-diagnosis" class="text-slate-800 dark:text-slate-100 font-medium">--</p>
                             </div>
                         </div>
@@ -110,24 +129,29 @@
                 <div id="edit-details-form" class="hidden">
                     <div class="card-white">
                         <div class="flex items-center justify-between mb-8 pb-6 border-b border-slate-50">
-                            <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Edit Information</h4>
+                            <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Edit
+                                Information</h4>
                             <button id="cancel-edit-btn"
                                 class="text-slate-400 dark:text-slate-500 font-bold text-sm uppercase tracking-widest hover:underline">Cancel</button>
                         </div>
                         <form id="update-profile-form" class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Full Name</label>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Full
+                                    Name</label>
                                 <input type="text" id="edit-name"
                                     class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                             </div>
                             <div>
-                                <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Age</label>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Age</label>
                                 <input type="number" id="edit-age"
                                     class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                             </div>
 
                             <div id="edit-specialty-container" style="display: none;" class="md:col-span-2">
-                                <label class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Specialty</label>
+                                <label
+                                    class="block text-xs font-bold text-slate-400 dark:text-slate-500 uppercase mb-2 ml-1">Specialty</label>
                                 <input type="text" id="edit-specialty"
                                     class="w-full px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border border-transparent dark:border-slate-700 rounded-2xl outline-none focus:ring-2 focus:ring-primary/20 transition-all">
                             </div>
@@ -143,10 +167,12 @@
                 <!-- Health Verification Card -->
                 <div class="card-white border-l-8 border-primary">
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-10 h-10 rounded-xl bg-primary dark:bg-sky-600/10 flex items-center justify-center text-primary">
+                        <div
+                            class="w-10 h-10 rounded-xl bg-primary dark:bg-sky-600/10 flex items-center justify-center text-primary">
                             <i data-lucide="shield-check"></i>
                         </div>
-                        <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Health Verification</h4>
+                        <h4 class="text-xl font-display font-bold text-slate-800 dark:text-slate-100">Health
+                            Verification</h4>
                     </div>
                     <div id="role-info"
                         class="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border border-transparent dark:border-slate-700 flex items-center justify-between">

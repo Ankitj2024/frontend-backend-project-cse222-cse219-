@@ -6,6 +6,12 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
     initDashboard();
+
+    // Periodic refresh every 30 seconds to keep dashboard in sync
+    setInterval(() => {
+        console.log('[Dashboard] Auto-refreshing data...');
+        initDashboard();
+    }, 30000);
 });
 
 window.initDashboard = async function initDashboard() {
@@ -145,41 +151,52 @@ async function renderPatientView() {
 
         // Task 8: Render Hero Section
         const pendingMeds = medsWithStatus.filter(m => m.status === 'pending');
-        
-    try {
-        const alerts = await apiFetch('/users/alerts');
-        let alertsContainer = document.getElementById('patient-alerts-container');
-        if (!alertsContainer) {
-            const heroParent = document.getElementById('next-dose-hero')?.parentElement;
-            if (heroParent) {
-                alertsContainer = document.createElement('div');
-                alertsContainer.id = 'patient-alerts-container';
-                heroParent.insertBefore(alertsContainer, document.getElementById('next-dose-hero'));
+
+        try {
+            const alerts = await apiFetch('/users/alerts');
+            let alertsContainer = document.getElementById('patient-alerts-container');
+            if (!alertsContainer) {
+                const heroParent = document.getElementById('next-dose-hero')?.parentElement;
+                if (heroParent) {
+                    alertsContainer = document.createElement('div');
+                    alertsContainer.id = 'patient-alerts-container';
+                    heroParent.insertBefore(alertsContainer, document.getElementById('next-dose-hero'));
+                }
             }
-        }
-        if (alertsContainer) {
-            if (alerts && alerts.length > 0) {
-                alertsContainer.innerHTML = alerts.map(a => `
+            if (alertsContainer) {
+                if (alerts && alerts.length > 0) {
+                    alertsContainer.innerHTML = alerts.map(a => `
                     <div id="alert-${a._id}" class="mb-4 bg-rose-50 border-l-4 border-rose-500 p-4 rounded-r-xl flex items-center justify-between shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="p-2 bg-rose-100 rounded-lg text-rose-600"><i data-lucide="bell-ring" class="w-5 h-5"></i></div>
+                            <div class="p-2 bg-rose-100 rounded-lg text-rose-600">
+                                <i data-lucide="${a.type === 'medicine' ? 'pill' : 'bell-ring'}" class="w-5 h-5"></i>
+                            </div>
                             <div>
                                 <p class="text-rose-800 font-bold text-sm">${a.message}</p>
-                                <p class="text-rose-500 text-xs mt-0.5">${new Date(a.date).toLocaleString([], {dateStyle: 'short', timeStyle: 'short'})}</p>
+                                <p class="text-rose-500 text-xs mt-0.5">${new Date(a.date).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</p>
                             </div>
                         </div>
-                        <button onclick="dismissAlert('${a._id}')" class="text-rose-400 hover:text-rose-600 p-2"><i data-lucide="x" class="w-4 h-4"></i></button>
+                        <div class="flex items-center gap-2">
+                            ${a.type === 'medicine' && a.medicineId ? `
+                                <button onclick="logMedFromAlert('${a.medicineId}', '${a._id}')" class="px-3 py-1.5 bg-rose-500 text-white text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-rose-600 transition-all shadow-sm">
+                                    Take
+                                </button>
+                            ` : ''}
+                            <button onclick="dismissAlert('${a._id}')" class="text-rose-400 hover:text-rose-600 p-2">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                            </button>
+                        </div>
                     </div>
                 `).join('');
-            } else {
-                alertsContainer.innerHTML = '';
+                } else {
+                    alertsContainer.innerHTML = '';
+                }
+                lucide.createIcons();
             }
-            lucide.createIcons();
-        }
-    } catch(e) { console.error('Failed to fetch alerts', e); }
+        } catch (e) { console.error('Failed to fetch alerts', e); }
 
-    const heroEl = document.getElementById('next-dose-hero');
-        
+        const heroEl = document.getElementById('next-dose-hero');
+
         if (window.countdownInterval) {
             clearInterval(window.countdownInterval);
         }
@@ -275,7 +292,7 @@ async function renderPatientView() {
                         const now = new Date();
                         const diffMs = targetTime - now;
                         const timerEl = document.getElementById('countdown-timer');
-                        
+
                         if (!timerEl) {
                             clearInterval(window.countdownInterval);
                             return;
@@ -291,7 +308,7 @@ async function renderPatientView() {
                         const h = Math.floor(diffMs / (1000 * 60 * 60));
                         const m = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
                         const s = Math.floor((diffMs % (1000 * 60)) / 1000);
-                        
+
                         timerEl.textContent = `${String(h).padStart(2, '0')}h ${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`;
                     };
 
@@ -316,15 +333,15 @@ async function renderPatientView() {
                     let statusColor = 'bg-warning text-white border-warning-dark';
                     let statusLabel = 'Pending';
                     let iconBg = 'bg-slate-100 text-slate-400 border-slate-200';
-                    
-                    if (m.status === 'taken') { 
-                        statusColor = 'bg-primary text-white border-primary-dark'; 
-                        statusLabel = 'Completed'; 
+
+                    if (m.status === 'taken') {
+                        statusColor = 'bg-primary text-white border-primary-dark';
+                        statusLabel = 'Completed';
                         iconBg = 'bg-primary text-white border-primary-dark';
                     }
-                    else if (m.status === 'skipped') { 
-                        statusColor = 'bg-danger text-white border-danger-dark'; 
-                        statusLabel = 'Missed'; 
+                    else if (m.status === 'skipped') {
+                        statusColor = 'bg-danger text-white border-danger-dark';
+                        statusLabel = 'Missed';
                         iconBg = 'bg-danger text-white border-danger-dark';
                     }
 
@@ -624,7 +641,7 @@ async function renderCaregiverView(container) {
     } catch (err) { console.error('Caregiver view error:', err); }
 }
 
-window.linkPatient = function() {
+window.linkPatient = function () {
     // Remove any existing modal
     document.getElementById('link-patient-modal')?.remove();
 
@@ -700,6 +717,9 @@ async function renderDoctorView(container) {
                 <p class="text-slate-400 dark:text-slate-500 font-medium mt-1" id="doc-subtitle">Medical Director: ${user.name}</p>
             </div>
             <div class="flex items-center gap-4">
+                <button onclick="linkPatient()" class="px-8 py-4 bg-white dark:bg-slate-800 text-primary border border-primary/30 rounded-2xl font-bold shadow-sm hover:shadow-md transition-all flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
+                    <i data-lucide="user-plus"></i> Link Patient
+                </button>
                 <button onclick="addNewPrescription()" class="bg-primary dark:bg-sky-600 text-white px-8 py-4 rounded-2xl font-bold shadow-sm hover:shadow-md transition-all border border-primary dark:shadow-none dark:border-sky-600 flex items-center gap-2 hover:scale-105 active:scale-95 transition-all">
                     <i data-lucide="plus"></i> New Prescription
                 </button>
@@ -809,7 +829,7 @@ async function renderDoctorView(container) {
 
         const overallAvg = Math.round(patientData.reduce((acc, p) => acc + p.adherence, 0) / (patientData.length || 1));
         const highRiskCount = patientData.filter(p => p.risk === 'High').length;
-        
+
         document.getElementById('doc-avg-adherence').textContent = overallAvg + '%';
         const hrCountEl = document.getElementById('doc-high-risk-count');
         if (hrCountEl) hrCountEl.textContent = highRiskCount;
@@ -858,6 +878,9 @@ async function renderDoctorView(container) {
                 <td class="px-8 py-6 text-right">
                     <div class="flex items-center justify-end gap-2">
                         <button class="px-4 py-2 border border-transparent dark:border-slate-700 text-slate-600 dark:text-slate-300 font-bold rounded-lg text-xs hover:border-primary hover:text-primary transition-all flex items-center gap-1"><i data-lucide="folder-open" class="w-3.5 h-3.5"></i> Record</button>
+                        <button onclick="event.stopPropagation(); unlinkPatient('${p._id}', '${p.name}')" class="px-4 py-2 bg-rose-50 text-rose-500 font-bold rounded-lg text-xs hover:bg-rose-100 transition-all flex items-center gap-1">
+                            <i data-lucide="user-minus" class="w-3.5 h-3.5"></i> Remove
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -1092,7 +1115,7 @@ window.addNewPrescription = async function () {
         const h24 = parseInt(hStr, 10);
         const period = h24 >= 12 ? 'PM' : 'AM';
         const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-        const time12 = `${String(h12).padStart(2,'0')}:${mStr} ${period}`;
+        const time12 = `${String(h12).padStart(2, '0')}:${mStr} ${period}`;
 
         const data = {
             user: document.getElementById('modal-patient').value,
@@ -1126,23 +1149,32 @@ function playDingSound() {
         const context = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
-        
+
         oscillator.type = 'sine';
         oscillator.frequency.setValueAtTime(880, context.currentTime); // A5
         oscillator.frequency.setValueAtTime(1108.73, context.currentTime + 0.1); // C#6
-        
+
         gainNode.gain.setValueAtTime(1, context.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
-        
+
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
-        
+
         oscillator.start();
         oscillator.stop(context.currentTime + 0.4);
     } catch (e) {
         console.log("Audio failed to play", e);
     }
 }
+
+window.logMedFromAlert = async function (medId, alertId) {
+    try {
+        await logMed(medId, 'taken');
+        await dismissAlert(alertId);
+    } catch (err) {
+        console.error('Failed to log from alert:', err);
+    }
+};
 
 window.logMed = async function (medId, status) {
     if (status === 'taken') {
@@ -1166,6 +1198,10 @@ window.logMed = async function (medId, status) {
             method: 'POST',
             body: JSON.stringify({ medicineId: medId, status })
         });
+
+        // Remove active scheduler alert if it exists
+        document.getElementById(`med-alert-${medId}`)?.remove();
+
         await renderPatientView();
     } catch (err) {
         const msg = err.message || '';
@@ -1177,14 +1213,14 @@ window.logMed = async function (medId, status) {
     }
 };
 
-window.undoLog = async function(logId) {
+window.undoLog = async function (logId) {
     if (!logId) return;
     try {
         await apiFetch('/logs/undo', {
             method: 'DELETE',
             body: JSON.stringify({ logId })
         });
-        
+
         const toast = document.createElement('div');
         toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl animate-fade-in text-sm flex items-center gap-2';
         toast.innerHTML = `<i data-lucide="rotate-ccw" class="w-5 h-5"></i> Log Removed`;
@@ -1192,14 +1228,14 @@ window.undoLog = async function(logId) {
         lucide.createIcons();
 
         setTimeout(() => toast.remove(), 3000);
-        
+
         initDashboard();
     } catch (err) {
         console.error('Error undoing log:', err);
     }
 };
 
-window.updatePatientVitals = async function(userId) {
+window.updatePatientVitals = async function (userId) {
     const hr = document.getElementById(`hr-${userId}`).value;
     const sys = document.getElementById(`sys-${userId}`).value;
     const dia = document.getElementById(`dia-${userId}`).value;
@@ -1219,14 +1255,14 @@ window.updatePatientVitals = async function(userId) {
             method: 'POST',
             body: JSON.stringify(payload)
         });
-        
+
         const toast = document.createElement('div');
         toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl animate-fade-in text-sm flex items-center gap-2';
         toast.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5"></i> Vitals Updated Successfully`;
         document.body.appendChild(toast);
         lucide.createIcons();
         setTimeout(() => toast.remove(), 3000);
-        
+
         initDashboard();
     } catch (err) {
         alert('Failed to update vitals: ' + (err.message || 'Server error'));
@@ -1234,23 +1270,45 @@ window.updatePatientVitals = async function(userId) {
 };
 
 
-window.sendPatientAlert = async function(patientId, patientName) {
+window.sendPatientAlert = async function (patientId, patientName) {
     try {
         await apiFetch('/users/alert', {
             method: 'POST',
             body: JSON.stringify({ patientId })
         });
         alert('Alert sent to ' + patientName + ' successfully!');
-    } catch(e) {
+    } catch (e) {
         alert('Failed to send alert.');
         console.error(e);
     }
 };
 
-window.dismissAlert = async function(id) {
+window.dismissAlert = async function (id) {
     try {
         await apiFetch(`/users/alerts/${id}/dismiss`, { method: 'PUT' });
         const el = document.getElementById(`alert-${id}`);
         if (el) el.remove();
-    } catch(e) { console.error('Failed to dismiss alert', e); }
+    } catch (e) { console.error('Failed to dismiss alert', e); }
+};
+
+window.unlinkPatient = async function (patientId, patientName) {
+    if (!confirm(`Are you sure you want to remove ${patientName} from your supervision?`)) return;
+
+    try {
+        await apiFetch('/users/unlink-patient', {
+            method: 'POST',
+            body: JSON.stringify({ patientId })
+        });
+        
+        // Show success toast
+        const toast = document.createElement('div');
+        toast.className = 'fixed top-6 left-1/2 -translate-x-1/2 z-[200] px-6 py-4 bg-emerald-500 text-white font-bold rounded-2xl shadow-xl dark:shadow-none text-sm';
+        toast.textContent = `${patientName} has been removed from your list.`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+
+        initDashboard();
+    } catch (err) {
+        alert('Failed to remove patient: ' + (err.message || 'Server error'));
+    }
 };

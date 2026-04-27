@@ -35,16 +35,16 @@ const caregivers = [
 ];
 
 const patients = [
-  { name: 'Amit Chauhan',     email: 'amit.p@medremind.com',     age: 65, doctorIdx: 0, caregiverIdx: 0 },
-  { name: 'Neha Agarwal',     email: 'neha.p@medremind.com',     age: 34, doctorIdx: 1, caregiverIdx: 0 },
-  { name: 'Ravi Tiwari',      email: 'ravi.p@medremind.com',     age: 72, doctorIdx: 0, caregiverIdx: 1 },
-  { name: 'Sunita Mishra',    email: 'sunita.p@medremind.com',   age: 55, doctorIdx: 2, caregiverIdx: 1 },
-  { name: 'Deepak Pandey',    email: 'deepak.p@medremind.com',   age: 28, doctorIdx: 3, caregiverIdx: 2 },
-  { name: 'Pooja Rawat',      email: 'pooja.p@medremind.com',    age: 40, doctorIdx: 4, caregiverIdx: 2 },
-  { name: 'Manoj Bhatt',      email: 'manoj.p@medremind.com',    age: 61, doctorIdx: 1, caregiverIdx: 3 },
-  { name: 'Shalini Negi',     email: 'shalini.p@medremind.com',  age: 48, doctorIdx: 2, caregiverIdx: 3 },
-  { name: 'Karan Thapa',      email: 'karan.p@medremind.com',    age: 30, doctorIdx: 3, caregiverIdx: 4 },
-  { name: 'Divya Bisht',      email: 'divya.p@medremind.com',    age: 52, doctorIdx: 4, caregiverIdx: 4 },
+  { name: 'Amit Chauhan',     email: 'amit.p@medremind.com',     age: 65, caregiverIdx: 0 },
+  { name: 'Neha Agarwal',     email: 'neha.p@medremind.com',     age: 34, caregiverIdx: 0 },
+  { name: 'Ravi Tiwari',      email: 'ravi.p@medremind.com',     age: 72, caregiverIdx: 1 },
+  { name: 'Sunita Mishra',    email: 'sunita.p@medremind.com',   age: 55, caregiverIdx: 1 },
+  { name: 'Deepak Pandey',    email: 'deepak.p@medremind.com',   age: 28, caregiverIdx: 2 },
+  { name: 'Pooja Rawat',      email: 'pooja.p@medremind.com',    age: 40, caregiverIdx: 2 },
+  { name: 'Ramesh Sharma',    email: 'ramesh.p@medremind.com',   age: 50, caregiverIdx: 3 },
+  { name: 'Geeta Verma',      email: 'geeta.p@medremind.com',    age: 60, caregiverIdx: 3 },
+  { name: 'Sanjay Gupta',     email: 'sanjay.p@medremind.com',   age: 45, caregiverIdx: 4 },
+  { name: 'Kiran Singh',      email: 'kiran.p@medremind.com',    age: 58, caregiverIdx: 4 },
 ];
 
 // Different medications for variety
@@ -155,7 +155,8 @@ async function seed() {
         password: hashedPassword,
         role: 'doctor',
         age: doc.age,
-        doctorName: doc.specialty,
+        specialty: doc.specialty,
+        isApproved: true, // Seeded doctors are approved
       });
       createdDoctors.push(user);
       console.log(`👨‍⚕️ Created doctor: ${doc.name} (${doc.specialty})`);
@@ -179,8 +180,8 @@ async function seed() {
     const createdPatients = [];
     for (let i = 0; i < patients.length; i++) {
       const pat = patients[i];
-      const doctor = createdDoctors[pat.doctorIdx];
       const caregiver = createdCaregivers[pat.caregiverIdx];
+      const doctor = createdDoctors[i % createdDoctors.length]; // Distribute 2 patients per doctor
 
       const user = await User.create({
         name: pat.name,
@@ -188,8 +189,8 @@ async function seed() {
         password: hashedPassword,
         role: 'patient',
         age: pat.age,
-        doctorName: doctor.name,
         caregiverId: caregiver._id,
+        doctorName: doctor.name, // Link to doctor
       });
       createdPatients.push(user);
 
@@ -198,7 +199,12 @@ async function seed() {
         $addToSet: { patientIds: user._id }
       });
 
-      console.log(`🧑 Created patient: ${pat.name} (age ${pat.age}) → Dr. ${doctor.name.split(' ').pop()}, CG: ${caregiver.name}`);
+      // Link patient to doctor's patientIds
+      await User.findByIdAndUpdate(doctor._id, {
+        $addToSet: { patientIds: user._id }
+      });
+
+      console.log(`🧑 Created patient: ${pat.name} (age ${pat.age}) → CG: ${caregiver.name}, Doc: ${doctor.name}`);
     }
 
     // ── Create Medications ───────────────────────────────
@@ -218,6 +224,7 @@ async function seed() {
           daysOfWeek: med.daysOfWeek || [],
           notes: med.notes || '',
           status: 'active',
+          prescribedByRole: 'doctor',
         });
         medIds.push(medicine._id);
       }

@@ -133,6 +133,13 @@ if (registerForm) {
             console.log('Registration response:', res);
 
             if (res && res.token) {
+                // For doctors, we don't log them in automatically because they need approval
+                if (role === 'doctor') {
+                    alert('Registration successful! Your account is pending administrator approval. You will be able to log in once approved.');
+                    window.location.href = '/index.html';
+                    return;
+                }
+
                 localStorage.setItem('token', res.token);
                 // Backward compatibility + root level assignment
                 const userObj = res.user ? res.user : {

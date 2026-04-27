@@ -94,6 +94,7 @@ async function loadMedicines() {
         </div>`;
 
     try {
+        const user = JSON.parse(localStorage.getItem('user'));
         const medicines = await apiFetch('/medicines');
 
         const filtered = currentFilter === 'all'
@@ -157,21 +158,27 @@ async function loadMedicines() {
 
                         <!-- Actions -->
                         <div class="flex items-center gap-2 shrink-0">
-                            <button onclick="editMedicine('${med._id}')"
-                                class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-primary dark:hover:bg-sky-500 hover:text-white dark:hover:text-white transition-all"
-                                title="Edit">
-                                <i data-lucide="pencil" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="toggleStatus('${med._id}', '${med.status || 'active'}')"
-                                class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-amber-50 dark:hover:bg-amber-500/20 hover:text-amber-500 dark:hover:text-amber-400 transition-all"
-                                title="${med.status === 'active' ? 'Pause' : 'Activate'}">
-                                <i data-lucide="${med.status === 'active' ? 'pause' : 'play'}" class="w-4 h-4"></i>
-                            </button>
-                            <button onclick="deleteMedicine('${med._id}')"
-                                class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-rose-400 flex items-center justify-center hover:bg-rose-500 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white transition-all"
-                                title="Delete">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
+                            ${(user.role === 'doctor' || user.role === 'caregiver' || (user.role === 'patient' && med.prescribedByRole === 'patient')) ? `
+                                <button onclick="editMedicine('${med._id}')"
+                                    class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-primary dark:hover:bg-sky-500 hover:text-white dark:hover:text-white transition-all"
+                                    title="Edit">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="toggleStatus('${med._id}', '${med.status || 'active'}')"
+                                    class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center hover:bg-amber-50 dark:hover:bg-amber-500/20 hover:text-amber-500 dark:hover:text-amber-400 transition-all"
+                                    title="${med.status === 'active' ? 'Pause' : 'Activate'}">
+                                    <i data-lucide="${med.status === 'active' ? 'pause' : 'play'}" class="w-4 h-4"></i>
+                                </button>
+                                <button onclick="deleteMedicine('${med._id}')"
+                                    class="w-9 h-9 rounded-xl bg-slate-50 dark:bg-slate-800 text-rose-400 flex items-center justify-center hover:bg-rose-500 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white transition-all"
+                                    title="Delete">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            ` : `
+                                <span class="px-3 py-1.5 bg-slate-100 text-slate-400 text-[10px] font-bold uppercase rounded-lg border border-slate-200 cursor-help" title="Only the person who scheduled this can modify it">
+                                    Locked
+                                </span>
+                            `}
                         </div>
                     </div>
                 </div>`;

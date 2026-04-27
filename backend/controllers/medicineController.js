@@ -77,6 +77,7 @@ exports.addMedicine = async (req, res) => {
             frequency: frequency || 'Daily',
             daysOfWeek: daysOfWeek || [],
             startDate: startDate || Date.now(),
+            prescribedByRole: requestingUser.role,
             ...(requestingUser.role === 'doctor' && notes !== undefined ? { notes } : {})
         });
 
@@ -148,6 +149,11 @@ exports.deleteMedicine = async (req, res) => {
 
         if (!isOwner && !isDoctor && !isLinkedCaregiver) {
             return res.status(401).json({ msg: 'Not authorized' });
+        }
+
+        // Patients can only delete medications they scheduled themselves
+        if (requestingUser.role === 'patient' && medicine.prescribedByRole !== 'patient') {
+            return res.status(403).json({ msg: 'Patients can only delete their own scheduled medications' });
         }
 
         await Medicine.findByIdAndDelete(req.params.id);

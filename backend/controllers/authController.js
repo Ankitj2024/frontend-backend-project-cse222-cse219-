@@ -35,13 +35,35 @@ exports.registerUser = async (req, res) => {
             password,
             role: userRole,
             age,
-            doctorName
+            doctorName,
+            // Doctors need admin approval; others are approved by default
+            isApproved: userRole === 'doctor' ? false : true
         });
 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);
 
         await user.save();
+
+        // If a doctor registered, notify all admins
+        if (userRole === 'doctor') {
+            try {
+                await User.updateMany(
+                    { role: 'admin' },
+                    { 
+                        $push: { 
+                            notifications: { 
+                                message: `New doctor registration request: ${name} (${email})`,
+                                date: new Date(),
+                                read: false
+                            } 
+                        } 
+                    }
+                );
+            } catch (notifyErr) {
+                console.error('Failed to notify admins of new doctor:', notifyErr);
+            }
+        }
 
         res.status(201).json({
             token: generateToken(user._id, user.role),
@@ -79,6 +101,11 @@ exports.loginUser = async (req, res) => {
         // Enforce role check if provided
         if (role && foundUser.role !== role) {
             return res.status(403).json({ msg: `Access denied. This account is registered as a ${foundUser.role}, not a ${role}.` });
+        }
+
+        // Check approval for doctors
+        if (foundUser.role === 'doctor' && !foundUser.isApproved) {
+            return res.status(403).json({ msg: 'Account pending approval from admin.' });
         }
 
         const isMatch = await bcrypt.compare(password, foundUser.password);

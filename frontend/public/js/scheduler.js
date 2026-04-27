@@ -15,6 +15,9 @@
     // Track active snooze timers: medId -> timeoutId
     const snoozeTimers = {};
 
+    // Track med count for sync
+    let lastMedCount = -1;
+
     /**
      * Convert "08:30 AM" / "02:30 PM" to { hours, minutes }
      */
@@ -62,7 +65,7 @@
         try {
             await apiFetch('/logs', {
                 method: 'POST',
-                body: JSON.stringify({ medicine: medId, status: 'taken' })
+                body: JSON.stringify({ medicineId: medId, status: 'taken' })
             });
         } catch (e) {
             console.warn('[Scheduler] Could not log taken status:', e.message);
@@ -258,12 +261,29 @@
         }
 
         try {
-            const meds = await apiFetch('/medicines');
+            const [meds, logs] = await Promise.all([
+                apiFetch('/medicines'),
+                apiFetch('/logs')
+            ]);
             if (!Array.isArray(meds)) return;
+
+            const todayStr = new Date().toDateString();
+            const todayLogs = Array.isArray(logs) ? logs.filter(l => new Date(l.date).toDateString() === todayStr) : [];
+
+            // Sync check: If count changed, refresh dashboard UI
+            if (lastMedCount !== -1 && meds.length !== lastMedCount) {
+                if (window.renderPatientView) window.renderPatientView();
+            }
+            lastMedCount = meds.length;
 
             for (const med of meds) {
                 if ((med.status || 'active') !== 'active') continue;
                 if (!isMedicineDueToday(med)) continue; // skip if not scheduled for today
+                
+                // Skip if already taken/skipped today
+                const isLogged = todayLogs.some(l => l.medicine?._id === med._id || l.medicine === med._id);
+                if (isLogged) continue;
+
                 if (notifiedThisMinute.has(med._id)) continue;
 
                 const parsed = parseTime12h(med.time);
@@ -275,14 +295,19 @@
                     showMedAlert(med);
                 }
             }
+
+            // Also refresh dashboard if the minute changed to keep countdowns accurate
+            if (minuteKey !== lastCheckedMinute && window.renderPatientView) {
+                window.renderPatientView();
+            }
         } catch (err) {
             console.warn('[Scheduler] Tick error:', err.message);
         }
     }
 
-    // Start immediately, then poll every 30 seconds
+    // Start immediately, then poll every 10 seconds
     tick();
-    setInterval(tick, 30 * 1000);
+    setInterval(tick, 10 * 1000);
 
     // Refresh dashboard when user returns to the tab
     document.addEventListener('visibilitychange', () => {
