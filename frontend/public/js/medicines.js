@@ -1,8 +1,8 @@
 // ─── State ───────────────────────────────────────────────────────────────────
-let currentFilter  = 'active';
-let editingId      = null;
-let medicineList   = null;
-let addMedForm     = null;
+let currentFilter = 'active';
+let editingId = null;
+let medicineList = null;
+let addMedForm = null;
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Query DOM elements AFTER DOM is ready
     medicineList = document.getElementById('medicine-list');
-    addMedForm   = document.getElementById('add-med-form');
+    addMedForm = document.getElementById('add-med-form');
 
     if (user.role === 'doctor') {
         await initDoctorMode();
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ─── Doctor: load patient dropdown ──────────────────────────────────────────
 async function initDoctorMode() {
     const container = document.getElementById('patient-select-container');
-    const select    = document.getElementById('assign-patient');
+    const select = document.getElementById('assign-patient');
     if (!container || !select) return;
 
     container.classList.remove('hidden');
@@ -35,7 +35,7 @@ async function initDoctorMode() {
         const patients = await apiFetch('/users/patients');
         patients.forEach(p => {
             const opt = document.createElement('option');
-            opt.value       = p._id;
+            opt.value = p._id;
             opt.textContent = `${p.name} (${p.email})`;
             select.appendChild(opt);
         });
@@ -53,7 +53,7 @@ async function initDoctorMode() {
 }
 
 // ─── Filter UI ───────────────────────────────────────────────────────────────
-window.setFilter = function(filter) {
+window.setFilter = function (filter) {
     currentFilter = filter;
 
     // Update tab styles
@@ -71,7 +71,7 @@ window.setFilter = function(filter) {
 };
 
 // ─── Toggle day-of-week picker based on frequency ─────────────────────────────
-window.toggleDayPicker = function() {
+window.toggleDayPicker = function () {
     const freq = document.getElementById('med-frequency')?.value;
     const picker = document.getElementById('day-picker-container');
     if (!picker) return;
@@ -114,9 +114,9 @@ async function loadMedicines() {
 
         medicineList.innerHTML = filtered.map(med => {
             const statusMap = {
-                'active':    { cls: 'bg-emerald-100 text-emerald-700', label: 'Active' },
-                'on hold':   { cls: 'bg-amber-100 text-amber-700',    label: 'On Hold' },
-                'completed': { cls: 'bg-slate-100 text-slate-500 dark:text-slate-400 dark:text-slate-500',    label: 'Completed' },
+                'active': { cls: 'bg-emerald-100 text-emerald-700', label: 'Active' },
+                'on hold': { cls: 'bg-amber-100 text-amber-700', label: 'On Hold' },
+                'completed': { cls: 'bg-slate-100 text-slate-500 dark:text-slate-400 dark:text-slate-500', label: 'Completed' },
             };
             const s = statusMap[med.status || 'active'] || statusMap['active'];
 
@@ -199,7 +199,7 @@ async function loadMedicines() {
 // ─── Helper: XSS safe ────────────────────────────────────────────────────────
 function escapeHtml(str) {
     if (!str) return '';
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ─── Helper: convert 12h → 24h for <input type="time"> ──────────────────────
@@ -212,7 +212,7 @@ function to24h(timeStr) {
     const period = m[3].toUpperCase();
     if (period === 'AM' && h === 12) h = 0;
     if (period === 'PM' && h !== 12) h += 12;
-    return `${String(h).padStart(2,'0')}:${min}`;
+    return `${String(h).padStart(2, '0')}:${min}`;
 }
 
 // ─── Helper: convert 24h → 12h AM/PM ─────────────────────────────────────────
@@ -222,20 +222,20 @@ function to12h(rawTime) {
     const h24 = parseInt(hStr, 10);
     const period = h24 >= 12 ? 'PM' : 'AM';
     const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-    return `${String(h12).padStart(2,'0')}:${mStr} ${period}`;
+    return `${String(h12).padStart(2, '0')}:${mStr} ${period}`;
 }
 
 // ─── UPDATE (enter edit mode): prefill form ───────────────────────────────────
-window.editMedicine = async function(id) {
+window.editMedicine = async function (id) {
     try {
         const med = await apiFetch(`/medicines/${id}`);
         editingId = id;
 
-        document.getElementById('edit-med-id').value    = id;
-        document.getElementById('med-name').value       = med.name;
-        document.getElementById('med-dosage').value     = med.dosage || '';
-        document.getElementById('med-time').value       = to24h(med.time);
-        document.getElementById('med-frequency').value  = med.frequency || 'Daily';
+        document.getElementById('edit-med-id').value = id;
+        document.getElementById('med-name').value = med.name;
+        document.getElementById('med-dosage').value = med.dosage || '';
+        document.getElementById('med-time').value = to24h(med.time);
+        document.getElementById('med-frequency').value = med.frequency || 'Daily';
         if (document.getElementById('med-notes')) document.getElementById('med-notes').value = med.notes || '';
 
         // Show/hide day picker and restore checked days
@@ -272,7 +272,7 @@ window.editMedicine = async function(id) {
 };
 
 // ─── Cancel edit → back to create mode ───────────────────────────────────────
-window.cancelEdit = function() {
+window.cancelEdit = function () {
     editingId = null;
     addMedForm.reset();
     document.getElementById('edit-med-id').value = '';
@@ -302,13 +302,13 @@ async function handleFormSubmit(e) {
     e.preventDefault();
     const user = JSON.parse(localStorage.getItem('user'));
 
-    const name      = document.getElementById('med-name').value.trim();
-    const rawTime   = document.getElementById('med-time').value;
-    const dosage    = document.getElementById('med-dosage').value.trim();
+    const name = document.getElementById('med-name').value.trim();
+    const rawTime = document.getElementById('med-time').value;
+    const dosage = document.getElementById('med-dosage').value.trim();
     const patientId = document.getElementById('assign-patient')?.value;
     const frequency = document.getElementById('med-frequency')?.value || 'Daily';
-    const status    = document.getElementById('med-status')?.value || 'active';
-    const notes     = document.getElementById('med-notes')?.value.trim();
+    const status = document.getElementById('med-status')?.value || 'active';
+    const notes = document.getElementById('med-notes')?.value.trim();
     const diagnosis = document.getElementById('med-diagnosis')?.value.trim();
 
     // Collect selected days of week (for Weekly)
@@ -389,7 +389,7 @@ function showToast(msg, color) {
 }
 
 // ─── TOGGLE STATUS (Pause / Activate) ────────────────────────────────────────
-window.toggleStatus = async function(id, currentStatus) {
+window.toggleStatus = async function (id, currentStatus) {
     const newStatus = currentStatus === 'active' ? 'on hold' : 'active';
     try {
         await apiFetch(`/medicines/${id}`, {
@@ -403,7 +403,7 @@ window.toggleStatus = async function(id, currentStatus) {
 };
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
-window.deleteMedicine = async function(id) {
+window.deleteMedicine = async function (id) {
     // Show inline confirmation instead of window.confirm (blocked in some environments)
     const existingConfirm = document.getElementById(`confirm-${id}`);
     if (existingConfirm) {

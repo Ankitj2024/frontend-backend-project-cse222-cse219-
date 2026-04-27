@@ -39,7 +39,11 @@ body {
     font-weight: 700;
 }
 
-.font-display { font-family: 'Varela Round', 'Nunito', sans-serif; font-weight: 800; letter-spacing: -0.02em; }
+.font-display {
+    font-family: 'Varela Round', 'Nunito', sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
 
 /* Layout Shell */
 .app-container {
@@ -87,14 +91,21 @@ body {
     border: 2px solid var(--card-border);
     color: var(--text-main);
 }
-.dark .nav-link:hover { background: #202f36; }
+
+.dark .nav-link:hover {
+    background: #202f36;
+}
 
 .nav-link.active {
     background: #ddf4ff;
     color: var(--secondary);
     border: 2px solid #84d8ff;
 }
-.dark .nav-link.active { background: #1a2f3a; border-color: #1a2f3a; }
+
+.dark .nav-link.active {
+    background: #1a2f3a;
+    border-color: #1a2f3a;
+}
 
 /* Mobile Bottom Nav */
 .mobile-nav {
@@ -139,7 +150,8 @@ body {
 }
 
 /* Duolingo Buttons */
-button, .btn-primary {
+button,
+.btn-primary {
     font-family: 'Nunito', sans-serif;
     font-weight: 800;
     text-transform: uppercase;
@@ -149,12 +161,14 @@ button, .btn-primary {
 }
 
 /* Base style for anything that looks like a primary button */
-.bg-primary { 
-    background-color: var(--primary) !important; 
+.bg-primary {
+    background-color: var(--primary) !important;
     border-color: var(--primary-dark) !important;
 }
 
-.text-primary { color: var(--primary) !important; }
+.text-primary {
+    color: var(--primary) !important;
+}
 
 /* Apply 3D effect to all buttons that have background colors */
 button[class*="bg-"] {
@@ -168,42 +182,100 @@ button[class*="bg-"]:active {
 }
 
 /* Fix specific button overrides */
-.bg-emerald-500 { background-color: var(--primary) !important; border-color: var(--primary-dark) !important; }
-.text-emerald-500 { color: var(--primary) !important; }
-.bg-emerald-50 { background-color: #e5f9d6 !important; }
-.text-emerald-600 { color: var(--primary-dark) !important; }
-.bg-emerald-100 { background-color: #d7ffb8 !important; }
+.bg-emerald-500 {
+    background-color: var(--primary) !important;
+    border-color: var(--primary-dark) !important;
+}
 
-.bg-rose-500 { background-color: var(--danger) !important; border-color: var(--danger-dark) !important; }
-.text-rose-500 { color: var(--danger) !important; }
-.bg-rose-50 { background-color: #ffdfe0 !important; }
-.text-rose-600 { color: var(--danger-dark) !important; }
-.bg-rose-100 { background-color: #ffc4c6 !important; }
+.text-emerald-500 {
+    color: var(--primary) !important;
+}
 
-.bg-amber-500 { background-color: var(--warning) !important; border-color: var(--warning-dark) !important; }
-.text-amber-500 { color: var(--warning) !important; }
-.bg-amber-50 { background-color: #fff4ce !important; }
+.bg-emerald-50 {
+    background-color: #e5f9d6 !important;
+}
 
-.bg-sky-500, .bg-sky-600 { background-color: var(--secondary) !important; border-color: var(--secondary-dark) !important; }
+.text-emerald-600 {
+    color: var(--primary-dark) !important;
+}
+
+.bg-emerald-100 {
+    background-color: #d7ffb8 !important;
+}
+
+.bg-rose-500 {
+    background-color: var(--danger) !important;
+    border-color: var(--danger-dark) !important;
+}
+
+.text-rose-500 {
+    color: var(--danger) !important;
+}
+
+.bg-rose-50 {
+    background-color: #ffdfe0 !important;
+}
+
+.text-rose-600 {
+    color: var(--danger-dark) !important;
+}
+
+.bg-rose-100 {
+    background-color: #ffc4c6 !important;
+}
+
+.bg-amber-500 {
+    background-color: var(--warning) !important;
+    border-color: var(--warning-dark) !important;
+}
+
+.text-amber-500 {
+    color: var(--warning) !important;
+}
+
+.bg-amber-50 {
+    background-color: #fff4ce !important;
+}
+
+.bg-sky-500,
+.bg-sky-600 {
+    background-color: var(--secondary) !important;
+    border-color: var(--secondary-dark) !important;
+}
 
 /* Rounded inputs */
-input, select {
+input,
+select {
     border: 2px solid var(--card-border) !important;
     background: #f7f7f7 !important;
     border-radius: 1rem !important;
     font-weight: 700 !important;
     font-family: 'Nunito', sans-serif;
 }
-input:focus, select:focus {
+
+input:focus,
+select:focus {
     border-color: var(--secondary) !important;
     background: #ffffff !important;
 }
-.dark input, .dark select { background: #202f36 !important; border-color: #37464f !important; }
+
+.dark input,
+.dark select {
+    background: #202f36 !important;
+    border-color: #37464f !important;
+}
 
 /* Animations */
 @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.9) translateY(10px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
 }
 
 .animate-slide-up {
@@ -217,7 +289,16 @@ input:focus, select:focus {
 }
 
 @media (max-width: 1024px) {
-    .sidebar { display: none; }
-    .main-content { margin-left: 0; padding: 1.5rem 1.5rem 6rem 1.5rem; }
-    .mobile-nav { display: flex; }
+    .sidebar {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1.5rem 1.5rem 6rem 1.5rem;
+    }
+
+    .mobile-nav {
+        display: flex;
+    }
 }

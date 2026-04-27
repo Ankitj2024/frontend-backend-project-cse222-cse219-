@@ -163,7 +163,7 @@ function renderCalendarAndStreak(allLogs) {
     // 2. Generate last 30 days
     const days = [];
     const today = new Date();
-    
+
     let currentStreak = 0;
     let longestStreak = 0;
     let tempStreak = 0;
@@ -177,9 +177,9 @@ function renderCalendarAndStreak(allLogs) {
         const d = new Date();
         d.setDate(today.getDate() - i);
         const dateStr = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
-        
+
         const dayLogs = logsByDay[dateStr] || [];
-        
+
         let status = 'gray'; // no data
         if (dayLogs.length > 0) {
             const hasSkipped = dayLogs.some(l => l.status === 'skipped');
@@ -217,7 +217,7 @@ function renderCalendarAndStreak(allLogs) {
             });
         }
     }
-    
+
     // Final check for longest streak
     if (tempStreak > longestStreak) longestStreak = tempStreak;
 
@@ -226,7 +226,7 @@ function renderCalendarAndStreak(allLogs) {
     const longestEl = document.getElementById('longest-streak');
     const lastMissedEl = document.getElementById('last-missed-date');
 
-    const sortedLogs = [...allLogs].sort((a,b) => new Date(b.date) - new Date(a.date));
+    const sortedLogs = [...allLogs].sort((a, b) => new Date(b.date) - new Date(a.date));
     const lastMissedLog = sortedLogs.find(l => l.status === 'skipped');
     const lastMissedStr = lastMissedLog ? new Date(lastMissedLog.date).toLocaleDateString() : 'Never';
 
@@ -266,9 +266,9 @@ function renderCalendarAndStreak(allLogs) {
                 </button>
             `;
         }).join('');
-        
+
         lucide.createIcons();
-        
+
         // Scroll to end (right) to show most recent dates
         setTimeout(() => {
             gridEl.scrollLeft = gridEl.scrollWidth;

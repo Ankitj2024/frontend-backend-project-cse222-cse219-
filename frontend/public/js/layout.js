@@ -90,28 +90,28 @@ const renderSidebar = () => {
     // Wrap content
     const originalContent = document.body.innerHTML;
     document.body.innerHTML = '';
-    
+
     const appContainer = document.createElement('div');
     appContainer.className = 'app-container';
     appContainer.innerHTML = sidebarHTML;
 
     const mainContent = document.createElement('main');
     mainContent.className = 'main-content';
-    
+
     const greetingLabel = user.role === 'doctor'
         ? 'Clinical Control Center'
         : user.role === 'caregiver'
-        ? 'Caregiver Hub'
-        : user.role === 'admin'
-        ? 'Administrator Hub'
-        : 'Personal Health Dashboard';
+            ? 'Caregiver Hub'
+            : user.role === 'admin'
+                ? 'Administrator Hub'
+                : 'Personal Health Dashboard';
 
     const showGreeting = isPage('dashboard');
 
     let rawName = user.name.trim();
     if (rawName.toLowerCase().startsWith('dr. ')) rawName = rawName.substring(4);
     else if (rawName.toLowerCase().startsWith('dr ')) rawName = rawName.substring(3);
-    
+
     const firstName = rawName.split(' ')[0];
     const greetingName = user.role === 'doctor' ? `Dr. ${firstName}` : firstName;
 
@@ -146,7 +146,7 @@ const renderSidebar = () => {
     mainContent.innerHTML = standardHeader + `<div class="content-body">${originalContent}</div>`;
     appContainer.appendChild(mainContent);
     document.body.appendChild(appContainer);
-    
+
     // Re-initialize icons
     if (window.lucide) lucide.createIcons();
 

@@ -57,7 +57,7 @@ if (registerForm) {
             const doctorInput = document.getElementById('reg-doctor');
             const dropdown = document.getElementById('doctor-dropdown');
             const listItems = document.getElementById('doctor-list-items');
-            
+
             if (!doctorInput || !dropdown || !listItems) return;
 
             let allDoctors = doctors || [];
@@ -65,7 +65,7 @@ if (registerForm) {
             const renderDoctors = (filterText = '') => {
                 listItems.innerHTML = '';
                 const filtered = allDoctors.filter(doc => doc.name.toLowerCase().includes(filterText.toLowerCase()));
-                
+
                 if (filtered.length === 0) {
                     listItems.innerHTML = '<li class="px-4 py-2 text-slate-400">No doctors found</li>';
                     return;
